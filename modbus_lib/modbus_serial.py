@@ -22,7 +22,6 @@ def receive_only_interframe_timeout(ser, first_byte_timeout, interframe_timeout)
             rx_buffer += rx_byte
     return rx_buffer
 
-
 def receive_for_server(ser):
     return receive_only_interframe_timeout(ser, None, INTERFRAME_TIMEOUT_S)
 
