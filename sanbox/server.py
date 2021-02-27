@@ -1,29 +1,19 @@
 import serial
 import time
 
-
-def receive_simplified_with_timeout(ser, timeout):
-    # init
-    rx_buffer = bytearray()
-    # wait first byte
-    ser.timeout = None
-    rx_byte = ser.read(1)
-    rx_start = time.time()
-    rx_buffer += rx_byte
-    # read rest of bytes
-    ser.timeout = 0
-    while (time.time() - rx_start) <= timeout:
-        rx_byte = ser.read(1)
-        if rx_byte:
-            rx_start = time.time()
-            rx_buffer += rx_byte
-    return rx_buffer
+from modbus_lib.modbus_serial import receive_for_server
 
 
-ser = serial.Serial('/dev/ttyACM0', 115200)
-print('\nServer running')
-try:
-    rx_buffer = receive_simplified_with_timeout(ser,0.00175)
-    print(rx_buffer)
-finally:
-    ser.close() 
+def run():
+    ser = serial.Serial('/dev/ttyACM0', 115200)
+    print('\nServer running')
+    try:
+        while True:
+            print()
+            rx_buffer = receive_for_server(ser)
+            print('RX:', rx_buffer.hex())
+            tx_buffer = bytearray([1,3,4,204,205,62,76,69,9])
+            ser.write(tx_buffer)
+            print('TX:', tx_buffer.hex())
+    finally:
+        ser.close() 
