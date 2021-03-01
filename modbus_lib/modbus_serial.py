@@ -7,22 +7,24 @@ RESPONSE_TIMEOUT = 0.5
 
 # ---- receive ----------------------------------------------------------------
 
-def receive_only_interframe_timeout(ser, first_byte_timeout, interframe_timeout):
+def receive_only_interframe_timeout(ser, response_timeout, interframe_timeout):
     # init
     rx_buffer = bytearray()
     # wait first byte
-    ser.timeout = first_byte_timeout
+    ser.timeout = response_timeout
     rx_byte = ser.read(1)
-    rx_start = time.time()
+    if rx_byte == bytearray():
+        return (rx_buffer, True)    # response timeout
+    rx_byte_start = time.time()
     rx_buffer += rx_byte
     # read rest of bytes
     ser.timeout = 0
-    while (time.time() - rx_start) <= interframe_timeout:
+    while (time.time() - rx_byte_start) <= interframe_timeout:
         rx_byte = ser.read(1)
         if rx_byte:
-            rx_start = time.time()
+            rx_byte_start = time.time()
             rx_buffer += rx_byte
-    return rx_buffer
+    return (rx_buffer, False)
 
 def receive_for_slave(ser):
     return receive_only_interframe_timeout(ser, None, INTERFRAME_TIMEOUT_S)
@@ -46,12 +48,18 @@ def send_request_unicast(ser, slave_addr, pdu):
     :raises XXXError: if XXX
     '''
     # create serial line pdu
+    serial_line_pdu = bytearray([1,3,0,126,0,2,164,19])
     # send serial line pdu
+    print('TX:', serial_line_pdu.hex())
+    ser.write(serial_line_pdu)
     # wait reply
+    reply, response_timeout_expired = receive_for_master(ser)
+    if response_timeout_expired:
+        return (reply, True) 
     # check correct slave replied 
+    if reply[0] != slave_addr:
             # In case of a reply received from an unexpected slave, the Response time-out is kept running
             # In case of an error detected on the frame, a retry may be performed
-    pass
 
 def send_request_broadcast():
     pass

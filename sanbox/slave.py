@@ -14,6 +14,7 @@ def run_slave(ser):
         print()
         rx_buffer = receive_for_slave(ser)
         print('RX:', rx_buffer.hex())
+        time.sleep(3)
         tx_buffer = bytearray([1,3,4,204,205,62,76,69,var])
         ser.write(tx_buffer)
         print('TX:', tx_buffer.hex())
