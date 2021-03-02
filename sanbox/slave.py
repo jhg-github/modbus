@@ -14,8 +14,39 @@ def run_slave(ser):
         print()
         rx_buffer = receive_for_slave(ser)
         print('RX:', rx_buffer.hex())
-        time.sleep(3)
-        tx_buffer = bytearray([1,3,4,204,205,62,76,69,var])
+
+        time.sleep(0.1)
+        tx_buffer = bytearray([2,0,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(0.1)
+        tx_buffer = bytearray([3,1,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(0.1)
+        tx_buffer = bytearray([2,0,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(0.1)
+        tx_buffer = bytearray([3,1,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(0.1)
+        tx_buffer = bytearray([2,0,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(0.1)
+        tx_buffer = bytearray([3,1,4,204,205,62,76,69,11])
+        ser.write(tx_buffer)
+        print('TX:', tx_buffer.hex())
+        
+        time.sleep(1)
+        tx_buffer = bytearray([1,2,4,204,205,62,76,69,11])
         ser.write(tx_buffer)
         print('TX:', tx_buffer.hex())
     
