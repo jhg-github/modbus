@@ -3,7 +3,7 @@ import modbus_lib.exceptions as execps
 
 
 INTERFRAME_TIMEOUT_S = 0.005
-RESPONSE_TIMEOUT_S = 2
+RESPONSE_TIMEOUT_S = 1
 
 
 # ---- receive ----------------------------------------------------------------
@@ -48,10 +48,10 @@ def send_request_unicast(ser, slave_addr, pdu):
     :param serial_port ser: The serial port sending/receiving the request/reply
     :param int slave_addr: The slave modbus addres [1-247]
     :param byte_array pdu: Modbus Protocol Data Unit (Function Code, Data)
-    :return: XXX
-    :rtype: XXX
-    :raises ReplyFrameNOKError: if XXX
-    :raises XXXError: if XXX
+    :return: slave reply pdu
+    :rtype: byte_array
+    :raises ReplyFrameNOKError: If reply frame contains a CRC error
+    :raises ResponseTimeoutError: If a reply from slave is not receive on time
     '''
     # create serial line pdu
     serial_line_pdu = bytearray([1,3,0,126,0,2,164,19])
@@ -71,8 +71,7 @@ def send_request_unicast(ser, slave_addr, pdu):
             if (reply[0] != slave_addr) and (rest_of_response_time > 0):
                 retry= True
             else:
-                retry= False
-            
+                retry= False            
         # check CRC
             # In case of an error detected on the frame, a retry may be performed
         # return reply frame
