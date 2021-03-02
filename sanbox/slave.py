@@ -10,6 +10,7 @@ event = Event()
 
 def run_slave(ser):
     global var
+
     while True:
         print()
         rx_buffer = receive_for_slave(ser)
@@ -25,7 +26,7 @@ def run_slave(ser):
         # ser.write(tx_buffer)
         # print('TX:', tx_buffer.hex())
         
-        time.sleep(1.1)
+        # time.sleep(2)
         tx_buffer = bytearray([1,2,4,204,205,62,76,69,11])
         ser.write(tx_buffer)
         print('TX:', tx_buffer.hex())

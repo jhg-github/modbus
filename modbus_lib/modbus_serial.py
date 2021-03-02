@@ -55,6 +55,9 @@ def send_request_unicast(ser, slave_addr, pdu):
     '''
     # create serial line pdu
     serial_line_pdu = bytearray([1,3,0,126,0,2,164,19])
+    #
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
     # send serial line pdu
     print('TX:', serial_line_pdu.hex())
     ser.write(serial_line_pdu)
