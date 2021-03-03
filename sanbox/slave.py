@@ -15,19 +15,7 @@ def run_slave(ser):
         print()
         rx_buffer = receive_for_slave(ser)
         print('RX:', rx_buffer.hex())
-
-        # time.sleep(0.1)
-        # tx_buffer = bytearray([2,0,4,204,205,62,76,69,11])
-        # ser.write(tx_buffer)
-        # print('TX:', tx_buffer.hex())
-        
-        # time.sleep(0.1)
-        # tx_buffer = bytearray([3,1,4,204,205,62,76,69,11])
-        # ser.write(tx_buffer)
-        # print('TX:', tx_buffer.hex())
-        
-        # time.sleep(2)
-        tx_buffer = bytearray([1,2,4,204,205,62,76,69,11])
+        tx_buffer = bytearray([1,3,4,204,205,62,76,69,9])
         ser.write(tx_buffer)
         print('TX:', tx_buffer.hex())
     
@@ -38,6 +26,8 @@ def modify_var():
         time.sleep(1)
         if event.is_set():
             break
+
+
 
 def run():
     ser = serial.Serial('COM38', 115200)

@@ -19,7 +19,7 @@ def run():
         # print('RX:', rx_buffer.hex())
         timeout_errors = 0
         frameNOK_errors = 0
-        for total in range(10000):
+        for total in range(100000):
             print()
             # time.sleep(1)
             try:  
@@ -28,10 +28,10 @@ def run():
             except execps.ResponseTimeoutError:
                 # print("ResponseTimeoutError exception catched!!!")
                 timeout_errors += 1
-                print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{}'.format( '----', total, timeout_errors, frameNOK_errors) )
+                print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- Timeout --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
             except execps.ReplyFrameNOKError:
                 # print("ReplyFrameNOKError exception catched!!!")
                 frameNOK_errors += 1
-                print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{}'.format( '----', total, timeout_errors, frameNOK_errors) )
+                print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- NOK --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
     finally:
         ser.close() 

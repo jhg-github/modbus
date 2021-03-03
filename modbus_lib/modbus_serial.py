@@ -1,9 +1,23 @@
 import time
+import struct
+
 import modbus_lib.exceptions as execps
+from modbus_lib.utils import calc_crc
 
 
-INTERFRAME_TIMEOUT_S = 0.005
+INTERFRAME_TIMEOUT_S = 0.01
 RESPONSE_TIMEOUT_S = 1
+
+
+
+# ---- crc --------------------------------------------------------------------
+def is_crc_ok(frame):
+    if len(frame) >=3:
+        crc_calc = calc_crc(frame[:-2])
+        crc_reply = struct.unpack('>H',frame[-2:])[0]
+        if crc_calc == crc_reply:   
+            return True
+    return False
 
 
 # ---- receive ----------------------------------------------------------------
@@ -76,9 +90,9 @@ def send_request_unicast(ser, slave_addr, pdu):
             else:
                 retry= False            
         # check CRC
-            # In case of an error detected on the frame, a retry may be performed
-        # return reply frame
-        return reply
+        if is_crc_ok(reply):
+            return reply
+        raise execps.ReplyFrameNOKError
     except execps.ResponseTimeoutError:
         raise execps.ResponseTimeoutError
 
