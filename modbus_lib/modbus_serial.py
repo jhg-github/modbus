@@ -1,5 +1,6 @@
 import time
 import struct
+import logging
 
 import modbus_lib.exceptions as execps
 from modbus_lib.utils import calc_crc
@@ -10,7 +11,7 @@ RESPONSE_TIMEOUT_S = 1
 
 
 class ModbusSerialLayer():
-    def __init__(self, ser, response_timeout_s, interframe_timeout_s):
+    def __init__(self, ser, response_timeout_s, interframe_timeout_s, logger_name=None):
         '''
         :param serial port ser: The serial port
         :param float response_timeout_s: Time in seconds to wait for a transmission. None is used to wait forever (slave)
@@ -20,6 +21,7 @@ class ModbusSerialLayer():
         self.ser = ser
         self.response_timeout_s = response_timeout_s
         self.interframe_timeout_s = interframe_timeout_s
+        self.logger = logging.getLogger(logger_name)
 
 
 # ---- receive ----------------------------------------------------------------
@@ -38,6 +40,7 @@ class ModbusSerialLayer():
         self.ser.timeout = response_timeout_s
         rx_byte = self.ser.read(1)
         if rx_byte == bytearray():
+            self.logger.error('ResponseTimeoutError')
             raise execps.ResponseTimeoutError()
         rx_byte_start = time.time()
         rx_frame += rx_byte
@@ -48,6 +51,7 @@ class ModbusSerialLayer():
             if rx_byte:
                 rx_byte_start = time.time()
                 rx_frame += rx_byte
+        self.logger.debug(f'RX: {rx_frame.hex()}')
         return rx_frame
 
     def receive_for_slave(self):
@@ -59,7 +63,7 @@ class ModbusSerialLayer():
 
     def send_frame(self, frame):
         self.ser.write(frame)
-        print('TX:', frame.hex())
+        self.logger.debug(f'TX: {frame.hex()}')
 
     def send_request_unicast(self, slave_addr, pdu):
         '''Sends a request to a single slave and waits for reply
@@ -96,6 +100,7 @@ class ModbusSerialLayer():
             # check CRC
             if self.is_crc_ok(reply):
                 return reply
+            self.logger.error('ReplyFrameNOKError')
             raise execps.ReplyFrameNOKError
         except execps.ResponseTimeoutError:
             raise execps.ResponseTimeoutError
