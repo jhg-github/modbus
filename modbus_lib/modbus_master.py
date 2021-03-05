@@ -2,6 +2,7 @@ import logging
 
 from modbus_lib.modbus_serial import ModbusSerialLayer
 from modbus_lib.modbus_application import ModbusApplicationLayer
+import modbus_lib.exceptions as execps
 
 
 class ModbusMaster():
@@ -17,10 +18,16 @@ class ModbusMaster():
         """
         self.logger = logging.getLogger('modbus_lib')
         self.logger.setLevel(logger_level)
+        self.is_logger_on = is_logger_on
         self.serial_layer = ModbusSerialLayer(ser, response_timeout_s, interframe_timeout_s, is_logger_on)
         self.app_layer = ModbusApplicationLayer(is_logger_on)
 
-    def read_holding_register(self, slave_address, starting_address, quantity_registers):
+    def read_holding_registers(self, slave_address, starting_address, quantity_registers):
+        if (quantity_registers < 1) or (quantity_registers > 125):
+            if self.is_logger_on:
+                self.logger.debug(f'Number of registers requested out of range: {quantity_registers}')
+                self.logger.error('RequestNumberRegistersError')
+            raise execps.RequestNumberRegistersError
         pdu = self.app_layer.f3_create_request_pdu(starting_address, quantity_registers)
         response_pdu = self.serial_layer.send_request_unicast(slave_address, pdu)
         data = self.app_layer.data_from_response_pdu(response_pdu, 3, quantity_registers*2)

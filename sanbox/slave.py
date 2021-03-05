@@ -24,12 +24,27 @@ def test_aux_CreateModbusException(rx_buffer, exception_code):
     response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
     return response
 
+
 def test_ReadSingleHoldingRegister(rx_buffer):
     slave_id = rx_buffer[0]
     function = rx_buffer[1]
     starting_address = struct.unpack('>H',rx_buffer[2:4])[0]
     data = struct.pack('>H',starting_address+1000)
-    pdu = bytearray([function, 2 ]) + data
+    bytes_count = 2
+    pdu = bytearray([function, bytes_count ]) + data
+    response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
+    return response
+
+def test_ReadMultipleHoldingRegister(rx_buffer):
+    slave_id = rx_buffer[0]
+    function = rx_buffer[1]
+    starting_address = struct.unpack('>H',rx_buffer[2:4])[0]
+    n_registers = struct.unpack('>H',rx_buffer[4:6])[0]
+    bytes_count = n_registers * 2
+    pdu = bytearray([function, bytes_count ])
+    for i in range(n_registers):
+        reg_data = struct.pack('>H',starting_address+i)
+        pdu += reg_data
     response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
     return response
 
@@ -84,6 +99,7 @@ def run_slave(slave):
         rx_buffer = slave.receive_for_slave()
 
         # tx_buffer = test_ReadSingleHoldingRegister(rx_buffer)
+        tx_buffer = test_ReadMultipleHoldingRegister(rx_buffer)
         # tx_buffer = test_ForceResponseTimeoutError(rx_buffer)
         # tx_buffer = test_ForceReplyFrameNOKError(rx_buffer)
         # tx_buffer = test_ForceModbusExceptionIllegalFunction(rx_buffer)
@@ -93,14 +109,14 @@ def run_slave(slave):
         # tx_buffer = test_ForceModbusExceptionAcknowledge(rx_buffer)
         # tx_buffer = test_ForceModbusExceptionServerDeviceBusy(rx_buffer)
         # tx_buffer = test_ForceModbusInvalidResponseLengthError(rx_buffer)
-        tx_buffer = test_ForceModbusUnknownException(rx_buffer)
+        # tx_buffer = test_ForceModbusUnknownException(rx_buffer)
         
         slave.send_frame(tx_buffer)
     
 
 
 def run():
-    ser = serial.Serial('COM38', 115200)
+    ser = serial.Serial('COM10', 115200)
     slave = ModbusSerialLayer(ser, 1, 0.01)
     print('\nslave running')
     # t_modify_var = Thread(target=modify_var)

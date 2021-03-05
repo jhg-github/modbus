@@ -10,11 +10,15 @@ from modbus_lib.utils import init_logger
 
 
 def test_ReadSingleRegister(mod_master):
-    response = mod_master.read_holding_register(1, 22, 1)
+    response = mod_master.read_holding_registers(1, 0, 1)
+    return response
+
+def test_ReadMultipleRegisters(mod_master):
+    response = mod_master.read_holding_registers(1, 0, 125)
     return response
 
 def test_ForceRequestSlaveIdError(mod_master):
-    response = mod_master.read_holding_register(248, 107, 3)
+    response = mod_master.read_holding_registers(248, 107, 3)
     return response
 
 #TODO with write function
@@ -23,15 +27,22 @@ def test_ForceRequestSlaveIdError(mod_master):
 #     return response
 
 def run():
-    ser = serial.Serial('COM39', 115200)
-    mod_master = ModbusMaster(ser, 1, 0.01,True,logging.DEBUG)
+    # ser = serial.Serial('COM39', 115200)
+    ser = serial.Serial('COM20', 115200)
+    # ser.set_buffer_size(rx_size = 12800, tx_size = 12800)
+    mod_master = ModbusMaster(ser, 1, 1,True,logging.DEBUG)
     print('\nmaster running')
     try:  
-        response = test_ReadSingleRegister(mod_master)
+        # response = test_ReadSingleRegister(mod_master)
+        # response = test_ReadMultipleRegisters(mod_master)
         # response = test_ForceRequestSlaveIdError(mod_master)
         # response = test_ForceRequestDataLengthError(mod_master)
+        # print('Response:', response.hex())
+        for i in range(10):
+            response = test_ReadMultipleRegisters(mod_master)
+            print('Response:', response.hex())
 
-        print('Response:', response.hex())
+
     except Exception as exc:
         print(str(exc))
     finally:

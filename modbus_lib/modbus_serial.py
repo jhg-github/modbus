@@ -49,7 +49,7 @@ class ModbusSerialLayer():
         # read rest of bytes
         self.ser.timeout = 0
         while (time.time() - rx_byte_start) <= interframe_timeout_s:
-            rx_byte = self.ser.read(1)
+            rx_byte = self.ser.read(1)  #TODO read all in buffer? for reception without fails
             if rx_byte:
                 rx_byte_start = time.time()
                 rx_frame += rx_byte

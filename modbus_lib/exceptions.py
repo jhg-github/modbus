@@ -105,3 +105,9 @@ class ModbusUnknownException(Exception):
     """
     pass
 
+class RequestNumberRegistersError(Exception):
+    """[summary]
+    Exception raised when requested number of registers out of range [1,125]
+    """
+    pass
+
