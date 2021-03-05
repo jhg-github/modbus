@@ -81,6 +81,9 @@ class ModbusSerialLayer():
         :raises ResponseTimeoutError: If a reply from slave is not receive on time
         '''
         # create serial line pdu
+        if slave_addr < 1 or slave_addr > 247:
+            self.logger.error(f'RequestSlaveIdError. Slave Id out of range: {slave_addr}')
+            raise execps.RequestSlaveIdError
         serial_line_pdu = self.create_serial_pdu(slave_addr, pdu )
         #
         self.ser.reset_input_buffer()

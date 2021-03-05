@@ -18,15 +18,16 @@ class ModbusApplicationLayer():
     def data_from_response_pdu(self, response_pdu, requested_function, requested_bytes):
         function = response_pdu[0]
         if function == requested_function:
-            data = response_pdu[1:]
-            if len(data) == requested_bytes:
+            byte_count = response_pdu[1]
+            data = response_pdu[2:]
+            if (byte_count == requested_bytes) and (len(data) == requested_bytes):
                 return data
             else:
                 if self.is_logger_on:
                     self.logger.debug(f'Requested bytes: {requested_bytes} - Received bytes: {len(data)}')
                     self.logger.error('ModbusInvalidResponseLengthError')
                 raise exceps.ModbusInvalidResponseLengthError
-        elif function == ( requested_function & 0x80):
+        elif function == ( requested_function | 0x80):
             exception_code = response_pdu[1]
             if exception_code == 1:
                 if self.is_logger_on:

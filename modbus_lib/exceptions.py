@@ -6,9 +6,20 @@ class ResponseTimeoutError(Exception):
 
 class ReplyFrameNOKError(Exception):
     """
-    Exception raised when the reply frame is NOK (CRC, ResponseTimeout)
+    Exception raised when the reply frame is NOK (CRC)
     """
     pass
+
+class RequestSlaveIdError(Exception):
+    """
+    Exception raised when trying to make a request with an slave address out
+    of valid range
+    """
+
+class RequestDataLengthError(Exception):
+    """
+    Exception raised when trying to make a request with wrong data length
+    """
 
 class ModbusExceptionIllegalFunction(Exception):
     """

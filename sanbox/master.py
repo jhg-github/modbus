@@ -9,34 +9,61 @@ import modbus_lib.exceptions as execps
 from modbus_lib.utils import init_logger
 
 
+def test_ReadSingleRegister(mod_master):
+    response = mod_master.read_holding_register(1, 22, 1)
+    return response
+
+def test_ForceRequestSlaveIdError(mod_master):
+    response = mod_master.read_holding_register(248, 107, 3)
+    return response
+
+#TODO with write function
+#  def test_ForceRequestDataLengthError(mod_master):
+#     response = mod_master.read_holding_register(1, 107, 3)
+#     return response
 
 def run():
     ser = serial.Serial('COM39', 115200)
     mod_master = ModbusMaster(ser, 1, 0.01,True,logging.DEBUG)
     print('\nmaster running')
-    try:
+    try:  
+        response = test_ReadSingleRegister(mod_master)
+        # response = test_ForceRequestSlaveIdError(mod_master)
+        # response = test_ForceRequestDataLengthError(mod_master)
 
-        timeout_errors = 0
-        frameNOK_errors = 0
-        for total in range(1):
-            print()
-            # time.sleep(1)
-            try:  
-                response = mod_master.read_holding_register(1, 107, 3)
-                print(response)
-                # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{}'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
-            except execps.ResponseTimeoutError:
-                # print("ResponseTimeoutError exception catched!!!")
-                timeout_errors += 1
-                # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- Timeout --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
-            except execps.ReplyFrameNOKError:
-                # print("ReplyFrameNOKError exception catched!!!")
-                frameNOK_errors += 1
-                # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- NOK --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
-            except Exception as exc:
-                print(str(exc))
+        print('Response:', response.hex())
+    except Exception as exc:
+        print(str(exc))
     finally:
         ser.close() 
+
+        
+# def run():
+#     ser = serial.Serial('COM39', 115200)
+#     mod_master = ModbusMaster(ser, 1, 0.01,True,logging.DEBUG)
+#     print('\nmaster running')
+#     try:
+#         timeout_errors = 0
+#         frameNOK_errors = 0
+#         for total in range(1):
+#             print()
+#             # time.sleep(1)
+#             try:  
+#                 response = mod_master.read_holding_register(1, 107, 3)
+#                 print(response)
+#                 # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{}'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
+#             except execps.ResponseTimeoutError:
+#                 # print("ResponseTimeoutError exception catched!!!")
+#                 timeout_errors += 1
+#                 # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- Timeout --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
+#             except execps.ReplyFrameNOKError:
+#                 # print("ReplyFrameNOKError exception catched!!!")
+#                 frameNOK_errors += 1
+#                 # print('RX: {:25}, total:{}, timeouts:{}, frameNOKs:{} -- NOK --'.format( rx_buffer.hex(), total, timeout_errors, frameNOK_errors) )
+#             except Exception as exc:
+#                 print(str(exc))
+#     finally:
+#         ser.close() 
 
 # def run():
 #     # logger_name = 'modbus_lib'
