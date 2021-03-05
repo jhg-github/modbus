@@ -14,7 +14,7 @@ def run_slave(slave):
     while True:
         print()
         rx_buffer = slave.receive_for_slave()
-        print('RX:', rx_buffer.hex())
+        # print('RX:', rx_buffer.hex())
         tx_buffer = bytearray([1,3,4,204,205,62,76,69,9])
         slave.send_frame(tx_buffer)
         # print('TX:', tx_buffer.hex())

@@ -81,7 +81,7 @@ class ModbusSerialLayer():
         :raises ResponseTimeoutError: If a reply from slave is not receive on time
         '''
         # create serial line pdu
-        serial_line_pdu = self.create_serial_pdu(slave_addr, bytearray([3,0,126,0,2]) )
+        serial_line_pdu = self.create_serial_pdu(slave_addr, pdu )
         #
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
@@ -103,7 +103,7 @@ class ModbusSerialLayer():
                     retry= False            
             # check CRC
             if self.is_crc_ok(reply):
-                return reply
+                return self.pdu_from_frame(reply)
             if self.is_logger_on:
                 self.logger.error('ReplyFrameNOKError')
             raise execps.ReplyFrameNOKError
@@ -126,9 +126,14 @@ class ModbusSerialLayer():
         return False
     
     @staticmethod
-    def create_serial_pdu(address, pdu):
-        serial_pdu = bytearray([address])
+    def create_serial_pdu(slave_address, pdu):
+        #TODO raise invalid slave address
+        serial_pdu = bytearray([slave_address])
         serial_pdu += pdu
         crc_calc = calc_crc(serial_pdu)
         serial_pdu += crc_calc.to_bytes(2, byteorder='big')
         return serial_pdu
+    
+    @staticmethod
+    def pdu_from_frame(frame):
+        return frame[1:-2]
