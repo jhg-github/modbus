@@ -30,5 +30,20 @@ class ModbusMaster():
             raise execps.RequestNumberRegistersError
         pdu = self.app_layer.f3_create_request_pdu(starting_address, quantity_registers)
         response_pdu = self.serial_layer.send_request_unicast(slave_address, pdu)
-        data = self.app_layer.data_from_response_pdu(response_pdu, 3, quantity_registers*2)
+        data = self.app_layer.f3_data_from_response_pdu(response_pdu, quantity_registers*2)
         return data
+    
+    def write_multiple_registers(self, slave_address, starting_address, quantity_registers, registers_value):
+        if (quantity_registers < 1) or (quantity_registers > 123):
+            if self.is_logger_on:
+                self.logger.debug(f'Number of registers to write out of range: {quantity_registers}')
+                self.logger.error('WriteNumberRegistersError')
+            raise execps.WriteNumberRegistersError
+        if len(registers_value) != (quantity_registers*2):
+            if self.is_logger_on:
+                self.logger.debug(f'Number of registers size different than register_value size: {quantity_registers*2}/{len(registers_value)}')
+                self.logger.error('WriteDataLengthError')
+            raise execps.WriteDataLengthError   
+        pdu = self.app_layer.f16_create_request_pdu(starting_address, quantity_registers, registers_value)
+        response_pdu = self.serial_layer.send_request_unicast(slave_address, pdu)
+        self.app_layer.f16_validate_response_pdu(response_pdu, starting_address, quantity_registers)

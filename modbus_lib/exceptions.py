@@ -16,9 +16,9 @@ class RequestSlaveIdError(Exception):
     of valid range
     """
 
-class RequestDataLengthError(Exception):
+class WriteDataLengthError(Exception):
     """
-    Exception raised when trying to make a request with wrong data length
+    Exception raised when trying to make a write with wrong data length
     """
 
 class ModbusExceptionIllegalFunction(Exception):
@@ -108,6 +108,19 @@ class ModbusUnknownException(Exception):
 class RequestNumberRegistersError(Exception):
     """[summary]
     Exception raised when requested number of registers out of range [1,125]
+    """
+    pass
+
+class WriteNumberRegistersError(Exception):
+    """[summary]
+    Exception raised when number of registers to write is out of range [1,123]
+    """
+    pass
+
+class InvalidWriteResponseError(Exception):
+    """[summary]
+    Exception raised when the start address or number of registers in a write
+    response don't equal the requested
     """
     pass
 
