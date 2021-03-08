@@ -73,7 +73,7 @@ class ModbusApplicationLayer():
         requested_function = 16
         function = response_pdu[0]
         if function == requested_function:
-            starting_address = struct.unpack('>H',response_pdu[2:3])[0]
+            starting_address = struct.unpack('>H',response_pdu[1:3])[0]
             quantity_registers = struct.unpack('>H',response_pdu[3:5])[0]
             if (starting_address == expected_starting_addres) and (quantity_registers == expected_quantity_registers):
                 return

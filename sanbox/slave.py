@@ -48,6 +48,13 @@ def test_ReadMultipleHoldingRegister(rx_buffer):
     response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
     return response
 
+def test_WriteMultipleRegisters(rx_buffer):
+    slave_id = rx_buffer[0]
+    pdu = rx_buffer[1:6]
+    response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
+    return response
+
+
 def test_ForceResponseTimeoutError(rx_buffer):
     time.sleep(2)
     return bytearray([1,3,4,204,205,62,76,69,9])
@@ -91,6 +98,13 @@ def test_ForceModbusUnknownException(rx_buffer):
     response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
     return response
 
+def test_ForceInvalidWriteResponseError(rx_buffer):
+    slave_id = rx_buffer[0]
+    pdu = bytearray(rx_buffer[1:6])
+    pdu[3] = pdu[3] + 1
+    response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
+    return response
+
 
 def run_slave(slave):
     # global var
@@ -99,7 +113,8 @@ def run_slave(slave):
         rx_buffer = slave.receive_for_slave()
 
         # tx_buffer = test_ReadSingleHoldingRegister(rx_buffer)
-        tx_buffer = test_ReadMultipleHoldingRegister(rx_buffer)
+        # tx_buffer = test_ReadMultipleHoldingRegister(rx_buffer)
+        # tx_buffer = test_WriteMultipleRegisters(rx_buffer)
         # tx_buffer = test_ForceResponseTimeoutError(rx_buffer)
         # tx_buffer = test_ForceReplyFrameNOKError(rx_buffer)
         # tx_buffer = test_ForceModbusExceptionIllegalFunction(rx_buffer)
@@ -110,6 +125,7 @@ def run_slave(slave):
         # tx_buffer = test_ForceModbusExceptionServerDeviceBusy(rx_buffer)
         # tx_buffer = test_ForceModbusInvalidResponseLengthError(rx_buffer)
         # tx_buffer = test_ForceModbusUnknownException(rx_buffer)
+        tx_buffer = test_ForceInvalidWriteResponseError(rx_buffer)
         
         slave.send_frame(tx_buffer)
     

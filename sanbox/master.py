@@ -31,8 +31,8 @@ def test_ReadMultipleRegisters_Xtimes(mod_master):
             print(f'{i+1} TOT | {frames_nok} NOK | {timeouts} TOUT')
 
 def test_WriteMultipleRegisters(mod_master):
-    response = mod_master.write_multiple_registers(1, 0, 2, bytearray([1,2,3,4]))
-    return response
+    mod_master.write_multiple_registers(1, 1, 2, bytearray([1,2,3,4]))    
+    
 
 def test_ForceRequestSlaveIdError(mod_master):
     response = mod_master.read_holding_registers(248, 107, 3)
@@ -43,8 +43,7 @@ def test_ForceWriteNumberRegistersError(mod_master):
     return response
 
 def test_ForceWriteDataLengthError(mod_master):
-    response = mod_master.write_multiple_registers(1, 1, 2, bytearray([1,2,3,4,5]))
-    return response
+    mod_master.write_multiple_registers(1, 1, 2, bytearray([1,2,3,4,5]))    
 
 def run():
     # ser = serial.Serial('COM39', 115200)
@@ -57,12 +56,12 @@ def run():
     try:  
         # response = test_ReadSingleRegister(mod_master)
         # response = test_ReadMultipleRegisters(mod_master)
-        # response = test_WriteMultipleRegisters(mod_master)
+        test_WriteMultipleRegisters(mod_master)
         # response = test_ForceRequestSlaveIdError(mod_master)
         # response = test_ForceWriteNumberRegistersError(mod_master)
         # response = test_ForceWriteDataLengthError(mod_master)
         # print('Response:', response.hex())
-        test_ReadMultipleRegisters_Xtimes(mod_master)
+        # test_ReadMultipleRegisters_Xtimes(mod_master)
         
 
 
