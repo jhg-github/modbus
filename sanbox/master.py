@@ -28,9 +28,11 @@ def test_ForceRequestSlaveIdError(mod_master):
 
 def run():
     # ser = serial.Serial('COM39', 115200)
-    ser = serial.Serial('COM20', 115200)
+    ser = serial.Serial('COM28', 115200)
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
     # ser.set_buffer_size(rx_size = 12800, tx_size = 12800)
-    mod_master = ModbusMaster(ser, 1, 1,True,logging.DEBUG)
+    mod_master = ModbusMaster(ser, 1, 0.05,True,logging.ERROR)
     print('\nmaster running')
     try:  
         # response = test_ReadSingleRegister(mod_master)
@@ -38,9 +40,18 @@ def run():
         # response = test_ForceRequestSlaveIdError(mod_master)
         # response = test_ForceRequestDataLengthError(mod_master)
         # print('Response:', response.hex())
-        for i in range(10):
-            response = test_ReadMultipleRegisters(mod_master)
-            print('Response:', response.hex())
+        frames_nok = 0
+        timeouts = 0
+        for i in range(10000):
+            try:
+                response = test_ReadMultipleRegisters(mod_master)
+                # print('Response:', response.hex())
+            except execps.ReplyFrameNOKError:
+                frames_nok += 1
+            except execps.ResponseTimeoutError:
+                timeouts += 1
+            finally:
+                print(f'{i+1} TOT | {frames_nok} NOK | {timeouts} TOUT')
 
 
     except Exception as exc:

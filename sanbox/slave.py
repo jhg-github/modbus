@@ -117,7 +117,9 @@ def run_slave(slave):
 
 def run():
     ser = serial.Serial('COM10', 115200)
-    slave = ModbusSerialLayer(ser, 1, 0.01)
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+    slave = ModbusSerialLayer(ser, 1, 0.05)
     print('\nslave running')
     # t_modify_var = Thread(target=modify_var)
     # t_modify_var.start()
