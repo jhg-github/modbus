@@ -4,6 +4,7 @@ from threading import Thread, Event
 import struct
 
 from modbus_lib.modbus_serial import ModbusSerialLayer
+from sanbox.mock import MockClass
 
 
 var = 0
@@ -91,6 +92,14 @@ def test_ForceModbusUnknownException(rx_buffer):
     response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
     return response
 
+def test_Mock_ReadSingleHoldingRegister(rx_buffer):
+    mock = MockClass()
+    slave_id = rx_buffer[0]
+    function = rx_buffer[1]
+    data = mock.get_reg_data(130)
+    pdu = bytearray([function, len(data) ]) + data
+    response = ModbusSerialLayer.create_serial_pdu(slave_id, pdu)
+    return response
 
 def run_slave(slave):
     # global var
@@ -99,7 +108,7 @@ def run_slave(slave):
         rx_buffer = slave.receive_for_slave()
 
         # tx_buffer = test_ReadSingleHoldingRegister(rx_buffer)
-        tx_buffer = test_ReadMultipleHoldingRegister(rx_buffer)
+        # tx_buffer = test_ReadMultipleHoldingRegister(rx_buffer)
         # tx_buffer = test_ForceResponseTimeoutError(rx_buffer)
         # tx_buffer = test_ForceReplyFrameNOKError(rx_buffer)
         # tx_buffer = test_ForceModbusExceptionIllegalFunction(rx_buffer)
@@ -110,13 +119,14 @@ def run_slave(slave):
         # tx_buffer = test_ForceModbusExceptionServerDeviceBusy(rx_buffer)
         # tx_buffer = test_ForceModbusInvalidResponseLengthError(rx_buffer)
         # tx_buffer = test_ForceModbusUnknownException(rx_buffer)
+        tx_buffer = test_Mock_ReadSingleHoldingRegister(rx_buffer)
         
         slave.send_frame(tx_buffer)
     
 
 
 def run():
-    ser = serial.Serial('COM10', 115200)
+    ser = serial.Serial('COM10', 115200, parity='E')
     slave = ModbusSerialLayer(ser, 1, 0.01)
     print('\nslave running')
     # t_modify_var = Thread(target=modify_var)
